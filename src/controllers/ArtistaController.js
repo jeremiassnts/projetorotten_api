@@ -1,4 +1,3 @@
-const express = require('express');
 const { Pool } = require('pg');
 
 async function index(req, res) {
