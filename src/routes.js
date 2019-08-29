@@ -7,14 +7,14 @@ const ScriptController = require('./controllers/ScriptController');
 
 const routes = express.Router();
 
-routes.get('/producoes', ProducaoController.index);
-routes.get('/producoes/:producaoId', ProducaoController.specific);
-routes.get('/artistas', ArtistaController.index);
-routes.get('/artistas/:artistaId', ArtistaController.specific);
-routes.get('/estudios', EstudioController.index);
-routes.get('/estudios/:estudioId', EstudioController.specific);
-routes.get('/scripts', ScriptController.index);
-routes.get('/scripts/:queryId', ScriptController.specific);
+routes.post('/producoes', ProducaoController.index);
+routes.post('/producoes/:producaoId', ProducaoController.specific);
+routes.post('/artistas', ArtistaController.index);
+routes.post('/artistas/:artistaId', ArtistaController.specific);
+routes.post('/estudios', EstudioController.index);
+routes.post('/estudios/:estudioId', EstudioController.specific);
+routes.post('/scripts', ScriptController.index);
+routes.post('/scripts/:queryId', ScriptController.specific);
 routes.post('/check', BDController.check);
 
 module.exports = routes;

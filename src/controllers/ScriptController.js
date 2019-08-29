@@ -11,7 +11,7 @@ async function specific(req, res) {
         return res.json("Query não encontrada")
     } else {
         const query = filteredQueries[0];
-        const { host, port, database, user, password } = req.headers;
+        const { host, port, database, user, password } = req.body;
         const client = new Client({
             host,
             port,

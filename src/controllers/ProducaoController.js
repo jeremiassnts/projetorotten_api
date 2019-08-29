@@ -1,7 +1,7 @@
 const { Pool } = require('pg')
 
 async function index(req, res) {
-    const { host, port, database, user, password } = req.headers;
+    const { host, port, database, user, password } = req.body;
     const pool = new Pool({
         host,
         port,
@@ -20,7 +20,7 @@ async function index(req, res) {
     }
 }
 async function specific(req, res) {
-    const { host, port, database, user, password } = req.headers;
+    const { host, port, database, user, password } = req.body;
     const pool = new Pool({
         host,
         port,
