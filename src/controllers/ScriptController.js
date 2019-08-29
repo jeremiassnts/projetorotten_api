@@ -1,5 +1,7 @@
+const { Client } = require('pg')
+
 async function index(req, res) {
-    return res.json(queries)
+    return res.json(queries.map(e => ({ id: e.id, question: e.question })))
 }
 
 async function specific(req, res) {
@@ -8,7 +10,26 @@ async function specific(req, res) {
     if (filteredQueries == null) {
         return res.json("Query não encontrada")
     } else {
-        return res.json(filteredQueries[0])
+        const query = filteredQueries[0];
+        const { host, port, database, user, password } = req.headers;
+        const client = new Client({
+            host,
+            port,
+            database,
+            user,
+            password,
+            ssl: true
+        })
+        try {
+            await client.connect();
+            const { rows } = await client.query(query.sql);
+            query.rows = rows;
+            await client.end();
+        } catch (err) {
+            await client.end();
+            return res.json(`Erro ao buscar informações => ${err}`);
+        }
+        return res.json(query)
     }
 }
 
@@ -20,7 +41,7 @@ const queries = [
     },
     {
         id: 2,
-        question: "--Quais séries e episódios cadastrados?",
+        question: "Quais séries e episódios cadastrados?",
         sql: `select p.titulo, p.sinopse, p.classificacaoindicativa, s.emissora, count(t.*) as numeroTemporadas, count(e.*) as numeroEpisodios from projetorotten.serie s
 join projetorotten.producao p on p.id = s.producaoid
 join projetorotten.temporada t on t.serieid = s.id
@@ -36,7 +57,7 @@ join projetorotten.entidade e on e.id = i.entidadeid
 where i.validado;`},
     {
         id: 4,
-        question: "--Quais atores não são diretores?",
+        question: "Quais atores não são diretores?",
         sql: `select p.nome from projetorotten.artista a
 join projetorotten.artistatrabalhoucomo atc on atc.artistaid = a.id
 join projetorotten.ocupacao o on o.id = atc.ocupacaoid
@@ -50,7 +71,7 @@ join projetorotten.pessoa p on p.id = a.pessoaid
 where o.nome = 'Diretor(a)';`},
     {
         id: 5,
-        question: "--Quais artistas possuem mais de uma ocupação?",
+        question: "Quais artistas possuem mais de uma ocupação?",
         sql: `select p.nome from projetorotten.artista a
 join projetorotten.pessoa p on p.id = a.pessoaid
 join projetorotten.artistatrabalhoucomo atc on atc.artistaid = a.id
@@ -58,7 +79,7 @@ group by p.nome
 having count(atc.*) > 1;`},
     {
         id: 6,
-        question: "--Quais artistas com seus respectivos prêmios, caso possuam, estão disponíveis?",
+        question: "Quais artistas com seus respectivos prêmios, caso possuam, estão disponíveis?",
         sql: `select p.nome, string_agg(o.nome, ', '), string_agg(pr.nome||' '||ap.especificacao, ', ') from projetorotten.artista a
 join projetorotten.pessoa p on p.id = a.pessoaid
 left join projetorotten.artistatrabalhoucomo atc on atc.artistaid = a.id
@@ -68,7 +89,7 @@ left join projetorotten.Premiacao pr on pr.id = ap.premiacaoid
 group by p.nome;`},
     {
         id: 7,
-        question: "--Quais atores que possuem nome iniciado com 'A', foram premiados?",
+        question: "Quais atores que possuem nome iniciado com 'A', foram premiados?",
         sql: `select p.nome from projetorotten.artista a
 join projetorotten.pessoa p on p.id = a.pessoaid
 left join projetorotten.ArtistaPremiacao ap on ap.artistaid = a.id
