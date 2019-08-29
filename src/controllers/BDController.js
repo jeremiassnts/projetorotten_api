@@ -7,7 +7,8 @@ async function check(req, res) {
         port,
         database,
         user,
-        password
+        password,
+        ssl: true
     });
     let message = "";
     let error = false;

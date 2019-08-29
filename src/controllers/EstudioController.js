@@ -7,11 +7,12 @@ async function index(req, res) {
         port,
         database,
         user,
-        password
+        password,
+        ssl: true
     });
     try {
         const result = await pool.query(
-            `select id, nome, sede from rottentomatoes.estudio
+            `select id, nome, sede from projetorotten.estudio
              order by nome`);
         await pool.end();
         return res.json(result.rows);
@@ -28,16 +29,17 @@ async function specific(req, res) {
         port,
         database,
         user,
-        password
+        password,
+        ssl: true
     });
     const { estudioId } = req.params;
     try {
         const estudio = (await pool.query(
-            `select * from rottentomatoes.estudio e
+            `select * from projetorotten.estudio e
              where e.id = ${estudioId}`)).rows[0];
         estudio.producoes = (await pool.query(
-            `select p.titulo, p.datalancamento from rottentomatoes.produzidopor pp
-             join rottentomatoes.producao p on p.id = pp.producaoid
+            `select p.titulo, p.datalancamento from projetorotten.produzidopor pp
+             join projetorotten.producao p on p.id = pp.producaoid
              where pp.estudioid = ${estudioId}
              order by p.titulo`
         )).rows;

@@ -7,10 +7,11 @@ async function index(req, res) {
         port,
         database,
         user,
-        password
+        password,
+        ssl: true
     });
     try {
-        const result = await pool.query(`select id, titulo, datalancamento from rottentomatoes.producao order by titulo`);
+        const result = await pool.query(`select id, titulo, datalancamento from projetorotten.producao order by titulo`);
         await pool.end();
         return res.json(result.rows);
     } catch (err) {
@@ -25,27 +26,28 @@ async function specific(req, res) {
         port,
         database,
         user,
-        password
+        password,
+        ssl: true
     });
     const { producaoId } = req.params;
     try {
         const producao = (await pool.query(
-            `select p.*, f.duracao, s.emissora, e.nome as estudio from rottentomatoes.producao p
-             left join rottentomatoes.filme f on f.producaoid = p.id
-             left join rottentomatoes.serie s on s.producaoid = p.id
-             left join rottentomatoes.produzidopor pp on pp.producaoid = p.id
-             left join rottentomatoes.estudio e on e.id = pp.estudioid
+            `select p.*, f.duracao, s.emissora, e.nome as estudio from projetorotten.producao p
+             left join projetorotten.filme f on f.producaoid = p.id
+             left join projetorotten.serie s on s.producaoid = p.id
+             left join projetorotten.produzidopor pp on pp.producaoid = p.id
+             left join projetorotten.estudio e on e.id = pp.estudioid
              where p.id = ${producaoId}`)).rows[0];
         producao.notas = (await pool.query(
-            `select nota from rottentomatoes.usuarioavaliaproducao
+            `select nota from projetorotten.usuarioavaliaproducao
              where producaoid = ${producaoId}`
         )).rows.map(e => e.nota);
         producao.criticas = (await pool.query(
-            `select p.nome, e.nome as entidade, i.cargo, c.nota, c.critica from rottentomatoes.imprensacriticaproducao c
-             join rottentomatoes.imprensa i on i.id = c.imprensaid
-             join rottentomatoes.entidade e on e.id = i.entidadeid
-             join rottentomatoes.usuario u on u.id = i.usuarioid
-             join rottentomatoes.pessoa p on p.id = u.pessoaid
+            `select p.nome, e.nome as entidade, i.cargo, c.nota, c.critica from projetorotten.imprensacriticaproducao c
+             join projetorotten.imprensa i on i.id = c.imprensaid
+             join projetorotten.entidade e on e.id = i.entidadeid
+             join projetorotten.usuario u on u.id = i.usuarioid
+             join projetorotten.pessoa p on p.id = u.pessoaid
              where c.producaoid = ${producaoId}
              order by c.critica`
         )).rows;
