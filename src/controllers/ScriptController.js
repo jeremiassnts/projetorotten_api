@@ -46,7 +46,7 @@ const queries = [
 join projetorotten.producao p on p.id = s.producaoid
 join projetorotten.temporada t on t.serieid = s.id
 join projetorotten.episodio e on e.serieid = s.id
-group by p.titulo, p.sinopse, p.classificacaoindicativa, s.emissora;`},
+group by p.titulo, p.classificacaoindicativa, s.emissora;`},
     {
         id: 3,
         question: "Quais são os usuários de imprensa validados?",
