@@ -43,7 +43,7 @@ async function specific(req, res) {
              where producaoid = ${producaoId}`
         )).rows.map(e => e.nota);
         producao.criticas = (await pool.query(
-            `select p.nome, e.nome as entidade, i.cargo, c.nota, c.critica from projetorotten.imprensacriticaproducao c
+            `select cast(concat(c.imprensaid, c.producaoid) as integer) as id, p.nome, e.nome as entidade, i.cargo, c.nota, c.critica from projetorotten.imprensacriticaproducao c
              join projetorotten.imprensa i on i.id = c.imprensaid
              join projetorotten.entidade e on e.id = i.entidadeid
              join projetorotten.usuario u on u.id = i.usuarioid

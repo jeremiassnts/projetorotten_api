@@ -38,7 +38,7 @@ async function specific(req, res) {
             `select * from projetorotten.estudio e
              where e.id = ${estudioId}`)).rows[0];
         estudio.producoes = (await pool.query(
-            `select p.titulo, p.datalancamento from projetorotten.produzidopor pp
+            `select p.id, p.titulo, p.datalancamento from projetorotten.produzidopor pp
              join projetorotten.producao p on p.id = pp.producaoid
              where pp.estudioid = ${estudioId}
              order by p.titulo`
