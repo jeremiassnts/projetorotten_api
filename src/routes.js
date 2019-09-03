@@ -9,6 +9,9 @@ const routes = express.Router();
 
 routes.post('/producoes', ProducaoController.index);
 routes.post('/producoes/:producaoId', ProducaoController.specific);
+routes.delete('/producoes/:producaoId', ProducaoController.remove);
+routes.put('/producoes', ProducaoController.update);
+routes.post('/producoes/insert', ProducaoController.insert);
 routes.post('/artistas', ArtistaController.index);
 routes.post('/artistas/:artistaId', ArtistaController.specific);
 routes.post('/estudios', EstudioController.index);
