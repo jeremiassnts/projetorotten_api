@@ -93,21 +93,20 @@ async function update(req, res) {
     try {
         let result = await pool.query(`
         update projetorotten.producao 
-        set titulo = '${producao.titulo}' 
-        and datalancamento = '${producao.datalancamento}' 
-        and idioma = '${producao.idioma}' 
-        and pais = '${producao.pais}' 
-        and sinopse = '${producao.sinopse}' 
-        and classificacaoindicativa = ${producao.classificacaoindicativa} 
+        set titulo = '${producao.titulo}', 
+        datalancamento = '${producao.datalancamento}', 
+        idioma = '${producao.idioma}', 
+        pais = '${producao.pais}', 
+        sinopse = '${producao.sinopse}', 
+        classificacaoindicativa = ${producao.classificacaoindicativa} 
         where id = ${producao.id}
         `)
         result = await pool.query(producao.filme
             ? `update projetorotten.filme 
-               set orcamento = ${producao.filme.orcamento} 
-               duracao = ${producao.filme.duracao} 
+               set duracao = ${producao.duracao} 
                where producaoId = ${producao.id}`
             : `update projetorotten.serie 
-               set emissora = ${producao.serie.emissora} 
+               set emissora = '${producao.emissora}' 
                where producaoId = ${producao.id}`
         )
         await pool.end();
