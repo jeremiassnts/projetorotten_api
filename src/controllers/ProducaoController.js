@@ -127,20 +127,43 @@ async function insert(req, res) {
         ssl: true
     });
     try {
-        let result = await pool.query(`
+        //Cria id para produção
+        let result = (await pool.query(`
+        select id from projetorotten.producao
+        order by id desc
+        `)).rows[0];
+        let producaoId = parseInt(result.id) + 1;
+        //Cria id para filme/serie
+        result = (await pool.query(`
+        select id from projetorotten.${producao.isMovie ? "filme" : "serie"}
+        order by id desc
+        `)).rows[0];
+        let childId = parseInt(result.id) + 1;
+        //Insere produção
+        result = await pool.query(`
         insert into projetorotten.producao 
         (id, titulo, datalancamento, idioma, pais, sinopse, classificacaoindicativa) 
         values 
-        (${producao.id}, '${producao.titulo}', '${producao.datalancamento}', '${producao.idioma}', '${producao.pais}', '${producao.sinopse}', ${producao.classificacaoindicativa})
+        (${producaoId}, '${producao.titulo}', '${producao.datalancamento}', '${producao.idioma}', '${producao.pais}', '${producao.sinopse}', ${producao.classificacaoindicativa})
         `)
-        result = await pool.query(producao.filme
-            ? `insert into projetorotten.filme 
-               (id, orcamento, duracao, producaoId) 
-               values (${producao.filme.id}, ${producao.filme.orcamento}, ${producao.filme.duracao}, ${producao.id})`
-            : `insert into projetorotten.serie 
-               (id, emissora, producaoId) 
-               values (${producao.serie.id}, '${producao.serie.emissora}', ${producao.id})`
-        )
+        if (producao.isMovie) {
+            await pool.query(`
+            insert into projetorotten.filme 
+            (id, orcamento, duracao, producaoId) 
+            values (${childId}, ${producao.filme.orcamento}, ${producao.filme.duracao}, ${producaoId})
+            `)
+            await pool.query(`
+            insert into projetorotten.produzidopor 
+            (estudioId, producaoId) values 
+            (${producao.filme.estudioId}, ${producaoId})
+            `)
+        } else {
+            await pool.query(`
+            insert into projetorotten.serie 
+            (id, emissora, producaoId) 
+            values (${childId}, '${producao.serie.emissora}', ${producaoId})
+            `)
+        }
         await pool.end();
         return res.json(result);
     } catch (err) {
